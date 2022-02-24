@@ -37,10 +37,7 @@ Installation by vim-plug and yarn
 Plug 'weirongxu/coc-rubocop', {'do': 'yarn install --frozen-lockfile'}
 ```
 
-
-# ChangeLog
-
-[ChangeLog](CHANGELOG.md)
+<!-- `:CocInstall coc-rubocop` -->
 
 ## Configuration
 
