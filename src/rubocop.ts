@@ -32,7 +32,7 @@ export class RubocopAutocorrectProvider
     const config = getConfig();
     const filename = pathLib.dirname(document.uri);
     try {
-      const args = [...getCommandArguments(filename), '--auto-correct'];
+      const args = [...getCommandArguments(filename), '--autocorrect'];
       const options = {
         cwd: getCurrentPath(filename),
         input: document.getText(),
