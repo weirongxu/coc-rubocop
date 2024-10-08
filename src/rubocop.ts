@@ -30,11 +30,11 @@ export class RubocopAutocorrectProvider
   implements DocumentFormattingEditProvider {
   public provideDocumentFormattingEdits(document: TextDocument): TextEdit[] {
     const config = getConfig();
-    const filename = pathLib.dirname(document.uri);
+    const filepath = Uri.parse(document.uri).fsPath;
     try {
-      const args = [...getCommandArguments(filename), '--autocorrect'];
+      const args = [...getCommandArguments(filepath), '--autocorrect'];
       const options = {
-        cwd: getCurrentPath(filename),
+        cwd: getCurrentPath(filepath),
         input: document.getText(),
       };
       let stdout;
@@ -125,13 +125,13 @@ function isFileUri(path: string): boolean {
   return uri.scheme === 'file';
 }
 
-function getCurrentPath(fileName: string): string {
-  return workspace.rootPath || pathLib.dirname(fileName);
+function getCurrentPath(filepath: string): string {
+  return workspace.rootPath || pathLib.dirname(filepath);
 }
 
 // extract argument to an array
-function getCommandArguments(fileName: string): string[] {
-  let commandArguments = ['--stdin', fileName, '--force-exclusion'];
+function getCommandArguments(filepath: string): string[] {
+  let commandArguments = ['--stdin', filepath, '--force-exclusion'];
   const extensionConfig = getConfig();
   if (extensionConfig.configFilePath !== '') {
     const found = [extensionConfig.configFilePath]
@@ -196,17 +196,14 @@ export class Rubocop {
   }
 
   public execute(document: TextDocument, onComplete?: () => void): void {
-    if (
-      (document.languageId !== 'ruby') ||
-      !isFileUri(document.uri)
-    ) {
+    if (document.languageId !== 'ruby' || !isFileUri(document.uri)) {
       // git diff has ruby-mode. but it is Untitled file.
       return;
     }
 
-    const filename = pathLib.dirname(document.uri);
     const uri = document.uri;
-    const currentPath = getCurrentPath(filename);
+    const filepath = Uri.parse(uri).fsPath;
+    const currentPath = getCurrentPath(filepath);
 
     const onDidExec = (
       error: Error | undefined,
@@ -267,7 +264,7 @@ export class Rubocop {
     };
 
     const jsonOutputFormat = ['--format', 'json'];
-    const args = getCommandArguments(filename)
+    const args = getCommandArguments(filepath)
       .concat(this.additionalArguments)
       .concat(jsonOutputFormat);
 
